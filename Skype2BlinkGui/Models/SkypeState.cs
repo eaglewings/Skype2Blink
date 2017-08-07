@@ -8,7 +8,7 @@
         /// </summary>
         public SkypeState()
         {
-
+            new Test();
         }
 
         private bool _Running = false;

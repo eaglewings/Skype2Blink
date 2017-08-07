@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Skype2Blink;
+using System.Diagnostics;
 
 namespace Skype2BlinkGui
 {
@@ -14,10 +11,25 @@ namespace Skype2BlinkGui
         ProcessWatcher skypeWatcher = new ProcessWatcher(PROCESS_NAME);
 
         public bool IsRunning { get; private set; }
-        public uint Instances { get; private set; }
+        public int Instances { get; private set; }
         public uint ProcessId { get; private set; }
 
-        uint instances = 0;
+
+        Process[] _processes;
+        public Process[] Processes
+        {
+            get { return _processes; }
+
+            private set {
+                if(_processes == null)
+                {
+                    _processes = value;
+                }
+            }
+        }
+        
+
+        int instances = 0;
 
         public SkypeStatusProvider()
         {
@@ -28,19 +40,20 @@ namespace Skype2BlinkGui
         private void OnStarted(object sender, EventArgs e)
         {
             
-            CountInstances();
+            MaintainInstances();
             Console.WriteLine("Started.");
         }
 
         private void OnTerminated(object sender, EventArgs e)
         {
-            CountInstances();
+            MaintainInstances();
             Console.WriteLine("Stopped.");
         }
 
-        private void CountInstances()
+        private void MaintainInstances()
         {
-
+            Processes = Process.GetProcessesByName(PROCESS_NAME);
+            
         }
 
 

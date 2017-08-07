@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Data;
+﻿using log4net;
+using System;
 using System.Management;
 
 namespace Skype2Blink
 {
-    class ProcessWatcher
+    public class ProcessWatcher
     {
         public delegate void StartedEventHandler(object sender, EventArgs e);
         public delegate void TerminatedEventHandler(object sender, EventArgs e);
@@ -19,10 +15,14 @@ namespace Skype2Blink
         // WMI event watcher
         private ManagementEventWatcher eventWatcher;
 
+        //Logger
+        private static readonly ILog log = LogManager.GetLogger(typeof(ProcessWatcher));
+
         public ProcessWatcher(string processName) : this(processName, 1.0) { }
 
         public ProcessWatcher(string processName, double sPollingIntervall)
         {
+
             string eventQuery = "SELECT * FROM __InstanceOperationEvent " + 
                 "WITHIN  " + sPollingIntervall +
                 " WHERE TargetInstance ISA 'Win32_Process' " +
@@ -34,16 +34,20 @@ namespace Skype2Blink
 
             eventWatcher.EventArrived += new EventArrivedEventHandler(this.OnEventArrived);
             eventWatcher.Start();
+
+            log.Debug("ProcessWatcher started: " + eventQuery);
         }
 
         public void Dispose()
         {
+            log.Debug("ProcessWatcher disposed: " + eventWatcher.Query);
             eventWatcher.Stop();
             eventWatcher.Dispose();
         }
 
         private void OnEventArrived(object sender, System.Management.EventArrivedEventArgs e)
         {
+            log.Debug("EventArrived: " + e);
             try
             {
                 string eventName = e.NewEvent.ClassPath.ClassName;
@@ -63,6 +67,7 @@ namespace Skype2Blink
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(ex.Message);
+                log.Debug("EventArrived Exception", ex);
             }
         }
     }

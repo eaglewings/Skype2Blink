@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Skype2BlinkGui.Models;
+﻿using Skype2BlinkGui.Models;
 
 namespace Skype2BlinkGui.ViewModels
 {
