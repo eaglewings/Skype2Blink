@@ -9,7 +9,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skype2BlinkGui", "Skype2Bli
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{D8862983-3BC2-46EB-A303-57AA8C14C688}"
 	ProjectSection(SolutionItems) = preProject
+		lib\HidLibrary.dll = lib\HidLibrary.dll
 		lib\log4net-2.0.8\bin\net\3.5\release\log4net.dll = lib\log4net-2.0.8\bin\net\3.5\release\log4net.dll
+		lib\ThingM.Blink1.dll = lib\ThingM.Blink1.dll
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrayApp", "TrayApp\TrayApp.csproj", "{B9DB0258-6C99-40A9-A029-89ED3D9917F2}"

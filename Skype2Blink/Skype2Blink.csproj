@@ -34,6 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="HidLibrary">
+      <HintPath>..\lib\HidLibrary.dll</HintPath>
+    </Reference>
     <Reference Include="log4net">
       <HintPath>..\lib\log4net-2.0.8\bin\net\3.5\release\log4net.dll</HintPath>
     </Reference>
@@ -47,6 +50,9 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml" />
+    <Reference Include="ThingM.Blink1">
+      <HintPath>..\lib\ThingM.Blink1.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ProcessWatcher.cs" />

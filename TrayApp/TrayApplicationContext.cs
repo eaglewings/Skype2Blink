@@ -4,6 +4,10 @@ using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
 using Skype2Blink;
+using System.Collections.Generic;
+using System.Diagnostics;
+using log4net;
+using System.Text.RegularExpressions;
 
 namespace TrayApp
 {
@@ -12,10 +16,15 @@ namespace TrayApp
         private static readonly string IconFileName = "blink1.ico";
         private static readonly string DefaultTooltip = "Skype2Blink";
 
+        //Logger
+        private static readonly ILog log = LogManager.GetLogger(typeof(TrayApplicationContext));
+
         private System.ComponentModel.IContainer components;	// a list of components to dispose when the context is disposed
         private NotifyIcon notifyIcon;				            // the icon that sits in the system tray
         private ToolStripMenuItem startStopItem;
         private ProcessWatcher processWatcher;
+        private Dictionary<int, TitleTracker> titleTrackers;
+        
 
         public TrayApplicationContext()
         {
@@ -73,7 +82,25 @@ namespace TrayApp
         {
             if(processWatcher == null)
             {
-                processWatcher = new ProcessWatcher("Skype.exe", 0.5);
+                string processName = "Skype";
+                processWatcher = new ProcessWatcher(processName, 0.5);
+                processWatcher.Started += Process_Started;
+                processWatcher.Terminated += Process_Terminated;
+
+                titleTrackers = new Dictionary<int, TitleTracker>();
+
+                Process[] processes = Process.GetProcessesByName(processName);
+                log.Info("Running \"" + processName + "\" process instances: " + processes.Length);
+
+                foreach (var process in processes)
+                {
+                    log.Info("Process id: " + process.Id);
+                    TitleTracker titleTracker = new TitleTracker((uint)process.Id);
+                    titleTracker.TitleChanged += TitleTracker_TitleChanged;
+                    titleTrackers.Add(process.Id, new TitleTracker((uint)process.Id));
+                }
+
+                processWatcher.Start();
                 startStopItem.Text = "Stop process watcher";
             }
             else
@@ -84,6 +111,26 @@ namespace TrayApp
             }
             
         }
+
+        private void TitleTracker_TitleChanged(object sender, TitleChangedEventArgs e)
+        {
+            Regex regex = new Regex(@"[^\[]+([1-9][\d]*)\]");
+            Match match = regex.Match(e.Title);
+            if (match.Groups.Count >= 1)
+            {
+                var unreadMessages = match.Groups[1].Value;
+            }
+        }
+
+        private void Process_Started(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Process_Terminated(object sender, EventArgs e)
+        {
+        }
+
 
         /// <summary>
         /// When the exit menu item is clicked, make a call to terminate the ApplicationContext.

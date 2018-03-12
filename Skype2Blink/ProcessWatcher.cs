@@ -1,16 +1,15 @@
 ﻿using log4net;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Management;
 
 namespace Skype2Blink
 {
     public class ProcessWatcher
     {
-        public delegate void StartedEventHandler(object sender, EventArgs e);
-        public delegate void TerminatedEventHandler(object sender, EventArgs e);
-
-        public StartedEventHandler Started = null;
-        public TerminatedEventHandler Terminated = null;
+        public EventHandler Started = null;
+        public EventHandler Terminated = null;
 
         // WMI event watcher
         private ManagementEventWatcher eventWatcher;
@@ -26,16 +25,20 @@ namespace Skype2Blink
             string eventQuery = "SELECT * FROM __InstanceOperationEvent " + 
                 "WITHIN  " + sPollingIntervall +
                 " WHERE TargetInstance ISA 'Win32_Process' " +
-                "   AND TargetInstance.Name = '" + processName + "'";
+                "   AND TargetInstance.Name = '" + processName + ".exe'";
 
             string managementScope = @"\\.\root\CIMV2";
 
             eventWatcher = new ManagementEventWatcher(managementScope, eventQuery);
 
             eventWatcher.EventArrived += new EventArrivedEventHandler(this.OnEventArrived);
-            eventWatcher.Start();
 
-            log.Debug("ProcessWatcher started: " + eventQuery);
+        }
+
+        public void Start()
+        {
+            eventWatcher.Start();
+            log.Debug("ProcessWatcher started: " + eventWatcher.Query);
         }
 
         public void Dispose()
@@ -66,7 +69,6 @@ namespace Skype2Blink
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine(ex.Message);
                 log.Debug("EventArrived Exception", ex);
             }
         }
